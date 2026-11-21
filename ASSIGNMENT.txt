@@ -1,0 +1,26 @@
+Assignment 1 — Image Processing
+
+Build on Windows: run build-assignment.bat from the repository directory.
+Requires Visual Studio C++ Build Tools and an OpenGL 4.3 driver.
+The script builds the assignment using BasicOpenGL's GLFW and GLAD and writes
+the four PNG and four TXT files into the repository directory.
+
+src/main.cpp: loads Lenna as RGBA using WIC, dispatches each filter, and writes
+the grayscale PNGs and comma-separated debug values. The grayscale debug file
+uses 16 levels; Canny and Halftone debug use 0/1.
+
+src/gl_image_processing.h: creates a GLFW core context, loads OpenGL with
+GLAD and transfers pixels. For rendering, it uses the engine's Shader class.
+src/res/shaders/image_processing.shader contains the vertex stage and the
+fragment stage. The fragment shader reads exact texels, averages RGB, and
+implements the 2 by 2 halftone pattern. Shader.cpp checks file and link errors.
+
+image_compute.glsl: Canny applies separable Gaussian smoothing, Sobel gradients,
+non-maximum suppression, two thresholds, and hysteresis using a queue.
+Floyd–Steinberg quantizes to 16 levels and distributes rounding error to
+unprocessed neighbors. The scan alternates direction by row and mirrors the weights. At borders the remaining neighbors share it equally.
+Each compute dispatch uses one invocation to retain the original processing order.
+
+Verified on Lenna: Grayscale, Canny and Floyd–Steinberg are 256 by 256;
+Halftone is 512 by 512. The first six generated files matched the prior
+implementation byte for byte. Floyd-Steinberg changed with the new scan order.
